@@ -12,6 +12,12 @@ const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const entities_1 = require("./entities");
+const auth_module_1 = require("./modules/auth/auth.module");
+const messages_module_1 = require("./modules/messages/messages.module");
+const projects_module_1 = require("./modules/projects/projects.module");
+const technologies_module_1 = require("./modules/technologies/technologies.module");
+const seed_module_1 = require("./seed/seed.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,10 +34,16 @@ exports.AppModule = AppModule = __decorate([
                 username: process.env.DB_USERNAME,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
+                entities: [entities_1.User, entities_1.Project, entities_1.Technology, entities_1.Message],
                 autoLoadEntities: true,
                 synchronize: true,
                 ssl: { rejectUnauthorized: false },
             }),
+            auth_module_1.AuthModule,
+            messages_module_1.MessagesModule,
+            projects_module_1.ProjectsModule,
+            technologies_module_1.TechnologiesModule,
+            seed_module_1.SeedModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
