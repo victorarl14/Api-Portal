@@ -12,7 +12,7 @@ export class Project {
   description: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  image_url: string;
+  image_url: string | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   github_url: string;
@@ -29,17 +29,11 @@ export class Project {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToMany('Technology', 'projects')
+  @ManyToMany('Technology', 'projects', { cascade: true })
   @JoinTable({
     name: 'project_technology',
-    joinColumn: {
-      name: 'project_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'technology_id',
-      referencedColumnName: 'id',
-    },
+    joinColumn: { name: 'project_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'technology_id', referencedColumnName: 'id' },
   })
   technologies: any[];
 } 

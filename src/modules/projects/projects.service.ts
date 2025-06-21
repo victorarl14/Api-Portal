@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Project, Technology } from '../../entities';
+import { ProjectResponseDto } from './project.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -19,11 +20,26 @@ export class ProjectsService {
     });
   }
 
-  async findFeatured(): Promise<Project[]> {
-    return this.projectRepository.find({
+  async findFeatured(): Promise<ProjectResponseDto[]> {
+    const projects = await this.projectRepository.find({
       where: { is_featured: true },
       relations: ['technologies'],
-      order: { created_at: 'DESC' },
+      order: { 
+        created_at: 'DESC' 
+      },
+    });
+
+    // Mapeo manual a DTO para romper las referencias circulares
+    return projects.map(project => {
+      const { technologies, ...rest } = project;
+      return {
+        ...rest,
+        technologies: technologies.map(tech => ({
+          id: tech.id,
+          name: tech.name,
+          icon_class: tech.icon_class,
+        })),
+      };
     });
   }
 

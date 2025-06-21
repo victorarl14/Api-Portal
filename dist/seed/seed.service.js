@@ -25,119 +25,115 @@ let SeedService = class SeedService {
         this.projectRepository = projectRepository;
     }
     async seedTechnologies() {
-        const technologies = [
-            {
-                name: 'HTML5',
-                icon_class: 'fab fa-html5',
-                category: entities_1.TechnologyCategory.FRONTEND,
-                proficiency_level: entities_1.ProficiencyLevel.EXPERT,
-            },
-            {
-                name: 'CSS3',
-                icon_class: 'fab fa-css3-alt',
-                category: entities_1.TechnologyCategory.FRONTEND,
-                proficiency_level: entities_1.ProficiencyLevel.ADVANCED,
-            },
-            {
-                name: 'JavaScript',
-                icon_class: 'fab fa-js-square',
-                category: entities_1.TechnologyCategory.FRONTEND,
-                proficiency_level: entities_1.ProficiencyLevel.ADVANCED,
-            },
-            {
-                name: 'React',
-                icon_class: 'fab fa-react',
-                category: entities_1.TechnologyCategory.FRONTEND,
-                proficiency_level: entities_1.ProficiencyLevel.ADVANCED,
-            },
-            {
-                name: 'TypeScript',
-                icon_class: 'fab fa-js-square',
-                category: entities_1.TechnologyCategory.FRONTEND,
-                proficiency_level: entities_1.ProficiencyLevel.INTERMEDIATE,
-            },
-            {
-                name: 'Node.js',
-                icon_class: 'fab fa-node-js',
-                category: entities_1.TechnologyCategory.BACKEND,
-                proficiency_level: entities_1.ProficiencyLevel.ADVANCED,
-            },
-            {
-                name: 'Python',
-                icon_class: 'fab fa-python',
-                category: entities_1.TechnologyCategory.BACKEND,
-                proficiency_level: entities_1.ProficiencyLevel.INTERMEDIATE,
-            },
-            {
-                name: 'PostgreSQL',
-                icon_class: 'fas fa-database',
-                category: entities_1.TechnologyCategory.DATABASE,
-                proficiency_level: entities_1.ProficiencyLevel.INTERMEDIATE,
-            },
-            {
-                name: 'Git',
-                icon_class: 'fab fa-git-alt',
-                category: entities_1.TechnologyCategory.DEVOPS,
-                proficiency_level: entities_1.ProficiencyLevel.ADVANCED,
-            },
-            {
-                name: 'GitHub',
-                icon_class: 'fab fa-github',
-                category: entities_1.TechnologyCategory.DEVOPS,
-                proficiency_level: entities_1.ProficiencyLevel.ADVANCED,
-            },
+        const technologiesData = [
+            { name: 'HTML5', icon_class: 'html-icon.png', category: entities_1.TechnologyCategory.FRONTEND, proficiency_level: entities_1.ProficiencyLevel.EXPERT },
+            { name: 'CSS3', icon_class: 'css-icon.png', category: entities_1.TechnologyCategory.FRONTEND, proficiency_level: entities_1.ProficiencyLevel.ADVANCED },
+            { name: 'JavaScript', icon_class: 'javascript-icon.png', category: entities_1.TechnologyCategory.FRONTEND, proficiency_level: entities_1.ProficiencyLevel.ADVANCED },
+            { name: 'React', icon_class: 'react-icon.png', category: entities_1.TechnologyCategory.FRONTEND, proficiency_level: entities_1.ProficiencyLevel.ADVANCED },
+            { name: 'Flutter', icon_class: 'flutter-icon.png', category: entities_1.TechnologyCategory.FRONTEND, proficiency_level: entities_1.ProficiencyLevel.INTERMEDIATE },
+            { name: 'Dart', icon_class: 'dart-icon.png', category: entities_1.TechnologyCategory.FRONTEND, proficiency_level: entities_1.ProficiencyLevel.INTERMEDIATE },
+            { name: 'Python', icon_class: 'python-icon.png', category: entities_1.TechnologyCategory.BACKEND, proficiency_level: entities_1.ProficiencyLevel.ADVANCED },
+            { name: 'Django', icon_class: 'django-icon.png', category: entities_1.TechnologyCategory.BACKEND, proficiency_level: entities_1.ProficiencyLevel.ADVANCED },
+            { name: 'Firebase', icon_class: 'firebase-icon.png', category: entities_1.TechnologyCategory.BACKEND, proficiency_level: entities_1.ProficiencyLevel.INTERMEDIATE },
+            { name: 'PostgreSQL', icon_class: 'postgres-icon.png', category: entities_1.TechnologyCategory.DATABASE, proficiency_level: entities_1.ProficiencyLevel.INTERMEDIATE },
+            { name: 'MySQL', icon_class: 'mysql-icon.png', category: entities_1.TechnologyCategory.DATABASE, proficiency_level: entities_1.ProficiencyLevel.INTERMEDIATE },
+            { name: 'Odoo', icon_class: 'odoo-icon.png', category: entities_1.TechnologyCategory.OTHER, proficiency_level: entities_1.ProficiencyLevel.INTERMEDIATE },
+            { name: 'Koha', icon_class: 'koha-icon.png', category: entities_1.TechnologyCategory.OTHER, proficiency_level: entities_1.ProficiencyLevel.INTERMEDIATE },
+            { name: 'C++', icon_class: 'c++-icon.png', category: entities_1.TechnologyCategory.OTHER, proficiency_level: entities_1.ProficiencyLevel.BEGINNER },
+            { name: 'Git', icon_class: 'git-icon.png', category: entities_1.TechnologyCategory.DEVOPS, proficiency_level: entities_1.ProficiencyLevel.ADVANCED },
+            { name: 'GitHub', icon_class: 'github-icon.png', category: entities_1.TechnologyCategory.DEVOPS, proficiency_level: entities_1.ProficiencyLevel.ADVANCED },
         ];
-        for (const tech of technologies) {
-            const existing = await this.technologyRepository.findOne({
-                where: { name: tech.name },
-            });
+        for (const tech of technologiesData) {
+            const existing = await this.technologyRepository.findOne({ where: { name: tech.name } });
             if (!existing) {
-                await this.technologyRepository.save(tech);
+                await this.technologyRepository.save(this.technologyRepository.create(tech));
+            }
+            else {
+                await this.technologyRepository.update(existing.id, { icon_class: tech.icon_class });
             }
         }
+        console.log('✅ Tecnologías sembradas y actualizadas');
     }
     async seedProjects() {
-        const projects = [
+        const [react, python, django, postgres, flutter, dart, firebase, odoo, javascript] = await Promise.all([
+            this.technologyRepository.findOne({ where: { name: 'React' } }),
+            this.technologyRepository.findOne({ where: { name: 'Python' } }),
+            this.technologyRepository.findOne({ where: { name: 'Django' } }),
+            this.technologyRepository.findOne({ where: { name: 'PostgreSQL' } }),
+            this.technologyRepository.findOne({ where: { name: 'Flutter' } }),
+            this.technologyRepository.findOne({ where: { name: 'Dart' } }),
+            this.technologyRepository.findOne({ where: { name: 'Firebase' } }),
+            this.technologyRepository.findOne({ where: { name: 'Odoo' } }),
+            this.technologyRepository.findOne({ where: { name: 'JavaScript' } }),
+        ]);
+        const projectsData = [
             {
-                title: 'Portfolio Personal',
-                description: 'Portfolio web desarrollado con React y TypeScript, mostrando mis proyectos y habilidades técnicas.',
-                image_url: 'https://via.placeholder.com/400x300',
-                github_url: 'https://github.com/tu-usuario/portfolio',
-                live_url: 'https://tu-portfolio.com',
+                title: '#VACA MEDIÁTICA',
+                description: 'Plataforma de Donaciones para el periodismo Venezolano.',
+                image_url: null,
+                github_url: 'https://github.com/tu-usuario/vaca-mediatica',
+                live_url: 'https://vaca-mediatica.com',
                 is_featured: true,
+                technologies: [odoo, python, javascript],
             },
             {
-                title: 'API REST con NestJS',
-                description: 'API RESTful desarrollada con NestJS y PostgreSQL, implementando autenticación JWT y CRUD completo.',
-                image_url: 'https://via.placeholder.com/400x300',
-                github_url: 'https://github.com/tu-usuario/api-nestjs',
-                live_url: 'https://tu-api.com',
+                title: 'ChatBot Xyra',
+                description: 'Modelo AI basado en contextualizar documentos.',
+                image_url: null,
+                github_url: 'https://github.com/tu-usuario/chatbot-xyra',
                 is_featured: true,
+                technologies: [python],
             },
             {
-                title: 'Sistema de Gestión',
-                description: 'Sistema web completo para gestión de proyectos con frontend en React y backend en Node.js.',
-                image_url: 'https://via.placeholder.com/400x300',
-                github_url: 'https://github.com/tu-usuario/sistema-gestion',
-                live_url: 'https://sistema-gestion.com',
+                title: 'Renovación de Certificados de Nacimiento',
+                description: 'Aplicación Web para la renovación de certificados de nacimiento.',
+                image_url: null,
+                live_url: 'https://renovacion-certificados.com',
+                is_featured: true,
+                technologies: [flutter, dart, firebase],
+            },
+            {
+                title: 'Proyecto Genérico 1',
+                description: 'Descripción de un proyecto genérico para rellenar el portafolio.',
+                image_url: 'https://via.placeholder.com/400x200.png?text=Proyecto+1',
                 is_featured: false,
+                technologies: [react],
+            },
+            {
+                title: 'Proyecto Genérico 2',
+                description: 'Descripción de un proyecto genérico para rellenar el portafolio.',
+                image_url: 'https://via.placeholder.com/400x200.png?text=Proyecto+2',
+                is_featured: false,
+                technologies: [python, django],
+            },
+            {
+                title: 'Proyecto Genérico 3',
+                description: 'Descripción de un proyecto genérico para rellenar el portafolio.',
+                image_url: 'https://via.placeholder.com/400x200.png?text=Proyecto+3',
+                is_featured: false,
+                technologies: [flutter, firebase],
             },
         ];
-        for (const project of projects) {
-            const existing = await this.projectRepository.findOne({
-                where: { title: project.title },
-            });
+        for (const projectData of projectsData) {
+            const existing = await this.projectRepository.findOne({ where: { title: projectData.title } });
             if (!existing) {
-                await this.projectRepository.save(project);
+                const newProject = this.projectRepository.create(projectData);
+                await this.projectRepository.save(newProject);
             }
         }
+        console.log('✅ Proyectos sembrados');
+    }
+    async cleanDatabase() {
+        await this.projectRepository.query('TRUNCATE TABLE "project_technology" RESTART IDENTITY CASCADE');
+        await this.projectRepository.query('TRUNCATE TABLE "projects" RESTART IDENTITY CASCADE');
+        await this.technologyRepository.query('TRUNCATE TABLE "technologies" RESTART IDENTITY CASCADE');
+        console.log('🧹 Base de datos limpiada');
     }
     async runSeed() {
         console.log('🌱 Iniciando seed de la base de datos...');
+        await this.cleanDatabase();
         await this.seedTechnologies();
-        console.log('✅ Tecnologías sembradas');
         await this.seedProjects();
-        console.log('✅ Proyectos sembrados');
         console.log('🎉 Seed completado exitosamente!');
     }
 };

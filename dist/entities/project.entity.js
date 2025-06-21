@@ -38,7 +38,7 @@ __decorate([
 ], Project.prototype, "description", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'varchar', length: 255, nullable: true }),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], Project.prototype, "image_url", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'varchar', length: 255, nullable: true }),
@@ -61,17 +61,11 @@ __decorate([
     __metadata("design:type", Date)
 ], Project.prototype, "updated_at", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)('Technology', 'projects'),
+    (0, typeorm_1.ManyToMany)('Technology', 'projects', { cascade: true }),
     (0, typeorm_1.JoinTable)({
         name: 'project_technology',
-        joinColumn: {
-            name: 'project_id',
-            referencedColumnName: 'id',
-        },
-        inverseJoinColumn: {
-            name: 'technology_id',
-            referencedColumnName: 'id',
-        },
+        joinColumn: { name: 'project_id', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'technology_id', referencedColumnName: 'id' },
     }),
     __metadata("design:type", Array)
 ], Project.prototype, "technologies", void 0);

@@ -4,7 +4,8 @@ export declare class SeedService {
     private technologyRepository;
     private projectRepository;
     constructor(technologyRepository: Repository<Technology>, projectRepository: Repository<Project>);
-    seedTechnologies(): Promise<void>;
-    seedProjects(): Promise<void>;
+    private seedTechnologies;
+    private seedProjects;
+    private cleanDatabase;
     runSeed(): Promise<void>;
 }

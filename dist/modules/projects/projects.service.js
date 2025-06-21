@@ -31,10 +31,23 @@ let ProjectsService = class ProjectsService {
         });
     }
     async findFeatured() {
-        return this.projectRepository.find({
+        const projects = await this.projectRepository.find({
             where: { is_featured: true },
             relations: ['technologies'],
-            order: { created_at: 'DESC' },
+            order: {
+                created_at: 'DESC'
+            },
+        });
+        return projects.map(project => {
+            const { technologies, ...rest } = project;
+            return {
+                ...rest,
+                technologies: technologies.map(tech => ({
+                    id: tech.id,
+                    name: tech.name,
+                    icon_class: tech.icon_class,
+                })),
+            };
         });
     }
     async findOne(id) {
