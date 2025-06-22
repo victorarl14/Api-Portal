@@ -37,8 +37,15 @@ import { SeedModule } from './seed/seed.module';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         entities: [User, Project, Technology, Message],
-        synchronize: true, // ¡Usar solo en desarrollo!
-        ssl: { rejectUnauthorized: false }, // Dependiendo de tu proveedor de BD
+        synchronize: configService.get<string>('NODE_ENV') !== 'production', // Solo en desarrollo
+        ssl: { rejectUnauthorized: false },
+        // Configuraciones de rendimiento para producción
+        extra: {
+          max: 20, // Máximo de conexiones en el pool
+          connectionTimeoutMillis: 30000,
+          idleTimeoutMillis: 30000,
+        },
+        logging: configService.get<string>('NODE_ENV') !== 'production', // Solo logs en desarrollo
       }),
     }),
     AuthModule,

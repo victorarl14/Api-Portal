@@ -10,6 +10,16 @@ export class AppController {
     return { 
       status: 'ok',
       message: 'API funcionando correctamente',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      memory: process.memoryUsage()
+    };
+  }
+
+  @Get('ping') // Endpoint simple para mantener la app activa
+  ping(): any {
+    return { 
+      pong: true,
       timestamp: new Date().toISOString()
     };
   }

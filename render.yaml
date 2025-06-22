@@ -5,5 +5,16 @@ services:
     repo: https://github.com/victorarl14/Api-Portal.git
     branch: main
     buildCommand: npm install && npm run build
-    startCommand: npm run start
+    startCommand: npm run start:prod
     plan: free
+    # Configuraciones para optimizar el rendimiento
+    healthCheckPath: /health
+    autoDeploy: true
+    # Variables de entorno para optimización
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 18.0.0
+      - key: PORT
+        value: 3000
