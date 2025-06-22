@@ -1,12 +1,16 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 
-@Controller('api') // Nota: la ruta base será /api
+@Controller() // Sin prefijo global
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('hola') // Ahora la ruta completa será /api/hola
-  getHola(): any {
-    return { mensaje: this.appService.getHello() };
+  @Get('health') // Endpoint de salud para verificar que la API funciona
+  getHealth(): any {
+    return { 
+      status: 'ok',
+      message: 'API funcionando correctamente',
+      timestamp: new Date().toISOString()
+    };
   }
 }

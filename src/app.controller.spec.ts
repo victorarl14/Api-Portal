@@ -14,9 +14,12 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  describe('GET /api/hola', () => {
-    it('should return { mensaje: "Hola mundo" }', () => {
-      expect(appController.getHola()).toEqual({ mensaje: 'Hola mundo' });
+  describe('GET /health', () => {
+    it('should return health status', () => {
+      const result = appController.getHealth();
+      expect(result).toHaveProperty('status', 'ok');
+      expect(result).toHaveProperty('message', 'API funcionando correctamente');
+      expect(result).toHaveProperty('timestamp');
     });
   });
 });

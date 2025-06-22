@@ -1,4 +1,9 @@
-# 📚 Documentación de la API del Portafolio
+# 📚 Documentación de la API - Portfolio de Víctor Rojas
+
+## 🌐 Base URL
+```
+https://api-portal-backend.onrender.com/api
+```
 
 ## 🚀 Endpoints Disponibles
 
@@ -13,8 +18,8 @@ Content-Type: application/json
   "username": "usuario123",
   "email": "usuario@ejemplo.com",
   "password": "contraseña123",
-  "first_name": "Juan",
-  "last_name": "Pérez"
+  "first_name": "Víctor",
+  "last_name": "Rojas"
 }
 ```
 
@@ -24,8 +29,21 @@ POST /auth/login
 Content-Type: application/json
 
 {
-  "email": "usuario@ejemplo.com",
+  "username": "usuario123",
   "password": "contraseña123"
+}
+```
+
+**Respuesta exitosa:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "uuid-del-usuario",
+    "username": "usuario123",
+    "email": "usuario@ejemplo.com",
+    "name": "Víctor Rojas"
+  }
 }
 ```
 
@@ -34,11 +52,12 @@ Content-Type: application/json
 #### Crear Mensaje
 ```http
 POST /messages
+Authorization: Bearer <token>
 Content-Type: application/json
 
 {
   "subject": "Consulta sobre proyecto",
-  "message_content": "Hola, me interesa tu trabajo..."
+  "message_content": "Me gustaría discutir una oportunidad de colaboración..."
 }
 ```
 
@@ -153,6 +172,22 @@ Este endpoint poblará la base de datos con:
 - Tecnologías básicas (HTML5, CSS3, JavaScript, React, etc.)
 - Proyectos de ejemplo
 
+### 🔍 Endpoint de Salud
+
+#### Verificar Estado de la API
+```http
+GET /health
+```
+
+**Respuesta:**
+```json
+{
+  "status": "ok",
+  "message": "API funcionando correctamente",
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+```
+
 ## 🗄️ Estructura de la Base de Datos
 
 ### Tabla: `users`
@@ -201,7 +236,19 @@ Este endpoint poblará la base de datos con:
 ## 🔧 Configuración
 
 ### Variables de Entorno (.env)
+
+#### Para Desarrollo Local
 ```env
+# Puerto del servidor
+PORT=3000
+
+# Clave secreta para JWT
+JWT_SECRET=tu_clave_secreta_muy_segura_aqui
+
+# URL del frontend para CORS
+FRONTEND_URL=http://localhost:5173
+
+# Base de datos (si usas una externa)
 DB_HOST=tu-host-postgresql
 DB_PORT=5432
 DB_USERNAME=tu-usuario
@@ -209,7 +256,24 @@ DB_PASSWORD=tu-contraseña
 DB_NAME=tu-base-de-datos
 ```
 
+#### Para Producción (Render)
+```env
+# Puerto (Render lo maneja automáticamente)
+PORT=3000
+
+# Clave secreta para JWT
+JWT_SECRET=tu_clave_secreta_muy_segura_aqui
+
+# URL del frontend para CORS
+FRONTEND_URL=https://tu-frontend.onrender.com
+
+# Base de datos (si usas una externa)
+DATABASE_URL=tu_url_de_base_de_datos
+```
+
 ## 🚀 Cómo Usar
+
+### Desarrollo Local
 
 1. **Instalar dependencias:**
    ```bash
@@ -235,12 +299,21 @@ DB_NAME=tu-base-de-datos
    - Proyectos: `GET http://localhost:3000/projects`
    - Tecnologías: `GET http://localhost:3000/technologies`
 
+### Despliegue en Render
+
+1. **Conectar repositorio a Render**
+2. **Configurar como servicio web**
+3. **Build Command:** `npm install && npm run build`
+4. **Start Command:** `npm run start:prod`
+5. **Añadir variables de entorno en Render Dashboard**
+
 ## 📝 Notas Importantes
 
 - La opción `synchronize: true` está habilitada para desarrollo. En producción, usar migraciones.
 - Las contraseñas se hashean con bcrypt antes de guardarse.
 - La API incluye validación básica de datos.
 - Todos los endpoints retornan respuestas en formato JSON.
+- **Para producción:** Asegúrate de configurar CORS correctamente con la URL de tu frontend.
 
 ## 🔒 Seguridad
 
