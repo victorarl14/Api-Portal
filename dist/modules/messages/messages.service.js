@@ -16,28 +16,31 @@ exports.MessagesService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const entities_1 = require("../../entities");
+const message_entity_1 = require("../../entities/message.entity");
 let MessagesService = class MessagesService {
     messageRepository;
-    userRepository;
-    constructor(messageRepository, userRepository) {
+    constructor(messageRepository) {
         this.messageRepository = messageRepository;
-        this.userRepository = userRepository;
     }
-    async createMessage(userId, createMessageDto) {
-        const { subject, message_content } = createMessageDto;
-        const message = this.messageRepository.create({
-            user_id: userId,
-            subject,
-            message_content,
+    async createMessage(user, createMessageDto) {
+        const { content, name, email } = createMessageDto;
+        const newMessage = this.messageRepository.create({
+            content,
+            name: user ? user.first_name + ' ' + user.last_name : name,
+            email: user ? user.email : email,
+            user: user,
         });
-        return this.messageRepository.save(message);
+        return this.messageRepository.save(newMessage);
     }
     async getMessagesByUser(userId) {
-        return this.messageRepository.find({
-            where: { user_id: userId },
-            order: { created_at: 'DESC' },
+        const messages = await this.messageRepository.find({
+            where: { user: { id: userId } },
+            relations: ['user'],
         });
+        if (!messages) {
+            throw new common_1.NotFoundException(`No se encontraron mensajes para el usuario con ID ${userId}`);
+        }
+        return messages;
     }
     async getAllMessages() {
         return this.messageRepository.find({
@@ -45,23 +48,19 @@ let MessagesService = class MessagesService {
             order: { created_at: 'DESC' },
         });
     }
-    async markAsRead(messageId) {
-        const message = await this.messageRepository.findOne({
-            where: { id: messageId },
-        });
+    async markAsRead(id) {
+        const message = await this.messageRepository.findOneBy({ id });
         if (!message) {
-            throw new common_1.NotFoundException('Mensaje no encontrado');
+            throw new common_1.NotFoundException(`No se encontró el mensaje con ID ${id}`);
         }
-        message.is_read = true;
+        message.read = true;
         return this.messageRepository.save(message);
     }
 };
 exports.MessagesService = MessagesService;
 exports.MessagesService = MessagesService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_1.InjectRepository)(entities_1.Message)),
-    __param(1, (0, typeorm_1.InjectRepository)(entities_1.User)),
-    __metadata("design:paramtypes", [typeorm_2.Repository,
-        typeorm_2.Repository])
+    __param(0, (0, typeorm_1.InjectRepository)(message_entity_1.Message)),
+    __metadata("design:paramtypes", [typeorm_2.Repository])
 ], MessagesService);
 //# sourceMappingURL=messages.service.js.map

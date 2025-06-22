@@ -1,12 +1,12 @@
 import { Repository } from 'typeorm';
-import { Message, User } from '../../entities';
-import { CreateMessageDto } from '../../dto/auth.dto';
+import { Message } from '../../entities/message.entity';
+import { CreateMessageDto } from '../../dto/message.dto';
+import { User } from 'src/entities';
 export declare class MessagesService {
-    private messageRepository;
-    private userRepository;
-    constructor(messageRepository: Repository<Message>, userRepository: Repository<User>);
-    createMessage(userId: string, createMessageDto: CreateMessageDto): Promise<Message>;
+    private readonly messageRepository;
+    constructor(messageRepository: Repository<Message>);
+    createMessage(user: User, createMessageDto: CreateMessageDto): Promise<Message>;
     getMessagesByUser(userId: string): Promise<Message[]>;
     getAllMessages(): Promise<Message[]>;
-    markAsRead(messageId: string): Promise<Message>;
+    markAsRead(id: string): Promise<Message>;
 }

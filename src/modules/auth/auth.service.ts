@@ -1,80 +1,70 @@
 import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
 import { User } from '../../entities';
 import { RegisterUserDto, LoginUserDto } from '../../dto/auth.dto';
-import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterUserDto): Promise<{ message: string; user: Partial<User> }> {
-    const { username, email, password, first_name, last_name } = registerDto;
+  async register(registerDto: RegisterUserDto): Promise<Partial<User>> {
+    const { email, password, first_name, last_name, username } = registerDto;
 
-    // Verificar si el usuario ya existe
-    const existingUser = await this.userRepository.findOne({
-      where: [{ email }, { username }],
-    });
-
+    const existingUser = await this.userRepository.findOne({ where: { email } });
     if (existingUser) {
-      throw new ConflictException('El usuario ya existe con ese email o username');
+      throw new ConflictException('Ya existe un usuario con este correo electrónico.');
     }
 
-    // Hashear la contraseña
-    const saltRounds = 10;
-    const password_hash = await bcrypt.hash(password, saltRounds);
+    const password_hash = await bcrypt.hash(password, 10);
 
-    // Crear el usuario
-    const user = this.userRepository.create({
-      username,
+    const newUser = this.userRepository.create({
       email,
       password_hash,
       first_name,
       last_name,
+      username: username || email.split('@')[0],
+      is_active: true,
     });
 
-    const savedUser = await this.userRepository.save(user);
-
-    // Retornar usuario sin contraseña
+    const savedUser = await this.userRepository.save(newUser);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password_hash: _, ...userWithoutPassword } = savedUser;
-    return {
-      message: 'Usuario registrado exitosamente',
-      user: userWithoutPassword,
-    };
+    return userWithoutPassword;
   }
 
-  async login(loginDto: LoginUserDto): Promise<{ message: string; user: Partial<User> }> {
+  async login(loginDto: LoginUserDto): Promise<{ accessToken: string }> {
     const { email, password } = loginDto;
 
-    // Buscar usuario por email
-    const user = await this.userRepository.findOne({
-      where: { email },
-    });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password_hash')
+      .where('user.email = :email', { email })
+      .getOne();
 
-    if (!user) {
-      throw new UnauthorizedException('Credenciales inválidas');
+    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+      throw new UnauthorizedException('Correo o contraseña incorrectos.');
     }
 
-    // Verificar contraseña
-    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Credenciales inválidas');
-    }
-
-    // Verificar si el usuario está activo
     if (!user.is_active) {
-      throw new UnauthorizedException('Usuario inactivo');
+      throw new UnauthorizedException('La cuenta de usuario está inactiva.');
     }
 
-    // Retornar usuario sin contraseña
-    const { password_hash: _, ...userWithoutPassword } = user;
+    const payload = {
+      sub: user.id,
+      username: user.username,
+      email: user.email,
+      name: `${user.first_name} ${user.last_name}`,
+    };
+    
     return {
-      message: 'Login exitoso',
-      user: userWithoutPassword,
+      accessToken: this.jwtService.sign(payload),
     };
   }
 } 

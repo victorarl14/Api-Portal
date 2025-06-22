@@ -1,16 +1,21 @@
-import { Controller, Post, Get, Body, Param, Patch } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Patch, UseGuards } from '@nestjs/common';
 import { MessagesService } from './messages.service';
-import { CreateMessageDto } from '../../dto/auth.dto';
+import { CreateMessageDto } from '../../dto/message.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { User } from 'src/entities';
 
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Post()
-  async createMessage(@Body() createMessageDto: CreateMessageDto) {
-    // Por ahora usamos un userId hardcodeado, después implementaremos autenticación JWT
-    const userId = 'temp-user-id';
-    return this.messagesService.createMessage(userId, createMessageDto);
+  @UseGuards(JwtAuthGuard)
+  async createMessage(
+    @Body() createMessageDto: CreateMessageDto,
+    @GetUser() user: User,
+  ) {
+    return this.messagesService.createMessage(user, createMessageDto);
   }
 
   @Get()

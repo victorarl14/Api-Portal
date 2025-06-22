@@ -69,25 +69,26 @@ export class SeedService {
       {
         title: '#VACA MEDIÁTICA',
         description: 'Plataforma de Donaciones para el periodismo Venezolano.',
-        image_url: null, // No tienes la imagen aún, lo ponemos como null.
-        github_url: 'https://github.com/tu-usuario/vaca-mediatica',
-        live_url: 'https://vaca-mediatica.com',
+        image_url: '/images/projects/vacamediatica-project.png',
+        github_url: '',
+        live_url: 'https://vacamediatica.odoo.com/',
         is_featured: true,
         technologies: [odoo, python, javascript],
       },
       {
         title: 'ChatBot Xyra',
         description: 'Modelo AI basado en contextualizar documentos.',
-        image_url: null, // No tienes la imagen aún, lo ponemos como null.
-        github_url: 'https://github.com/tu-usuario/chatbot-xyra',
+        image_url: '/images/projects/chatbot-xyra-project.png',
+        github_url: 'https://github.com/victorarl14/chatbot-langchain.git',
+        live_url: 'https://colab.research.google.com/drive/1JaX8__AiwfSMf0NeWM2wpyZEDUDfyYk1#scrollTo=lqCLAccIxEd4',
         is_featured: true,
         technologies: [python],
       },
       {
         title: 'Renovación de Certificados de Nacimiento',
         description: 'Aplicación Web para la renovación de certificados de nacimiento.',
-        image_url: null, // No tienes la imagen aún, lo ponemos como null.
-        live_url: 'https://renovacion-certificados.com',
+        image_url: '/images/projects/birth-certificate.png',
+        github_url: 'https://github.com/victorarl14/certificados_nacimiento.git',
         is_featured: true,
         technologies: [flutter, dart, firebase],
       },
@@ -111,6 +112,14 @@ export class SeedService {
         image_url: 'https://via.placeholder.com/400x200.png?text=Proyecto+3', // Usamos un placeholder
         is_featured: false,
         technologies: [flutter, firebase],
+      },
+      {
+        title: 'Reconocimiento de secuencia de poses de Yoga',
+        description: 'Modelo de IA para detectar y validar secuencias de posturas de yoga en tiempo real.',
+        image_url: '/images/projects/yoga-pose-secuence.png',
+        live_url: 'https://colab.research.google.com/drive/11GtPf3fZD_c0JKY-pHvmrjO95yHjVAEc?usp=sharing',
+        is_featured: true, // Puedes cambiarlo a true si quieres que se destaque
+        technologies: [python],
       },
     ];
 

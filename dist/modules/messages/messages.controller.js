@@ -15,15 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessagesController = void 0;
 const common_1 = require("@nestjs/common");
 const messages_service_1 = require("./messages.service");
-const auth_dto_1 = require("../../dto/auth.dto");
+const message_dto_1 = require("../../dto/message.dto");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const get_user_decorator_1 = require("../auth/decorators/get-user.decorator");
+const entities_1 = require("../../entities");
 let MessagesController = class MessagesController {
     messagesService;
     constructor(messagesService) {
         this.messagesService = messagesService;
     }
-    async createMessage(createMessageDto) {
-        const userId = 'temp-user-id';
-        return this.messagesService.createMessage(userId, createMessageDto);
+    async createMessage(createMessageDto, user) {
+        return this.messagesService.createMessage(user, createMessageDto);
     }
     async getAllMessages() {
         return this.messagesService.getAllMessages();
@@ -38,9 +40,12 @@ let MessagesController = class MessagesController {
 exports.MessagesController = MessagesController;
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, get_user_decorator_1.GetUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [auth_dto_1.CreateMessageDto]),
+    __metadata("design:paramtypes", [message_dto_1.CreateMessageDto,
+        entities_1.User]),
     __metadata("design:returntype", Promise)
 ], MessagesController.prototype, "createMessage", null);
 __decorate([

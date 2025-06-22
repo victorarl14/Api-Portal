@@ -1,9 +1,11 @@
+import { User } from './user.entity';
 export declare class Message {
     id: string;
-    user_id: string;
-    subject: string;
-    message_content: string;
-    is_read: boolean;
+    name: string;
+    email: string;
+    content: string;
+    read: boolean;
     created_at: Date;
-    user: any;
+    updated_at: Date;
+    user: User;
 }

@@ -16,56 +16,56 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const entities_1 = require("../../entities");
+const jwt_1 = require("@nestjs/jwt");
 const bcrypt = require("bcryptjs");
+const entities_1 = require("../../entities");
 let AuthService = class AuthService {
     userRepository;
-    constructor(userRepository) {
+    jwtService;
+    constructor(userRepository, jwtService) {
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
     }
     async register(registerDto) {
-        const { username, email, password, first_name, last_name } = registerDto;
-        const existingUser = await this.userRepository.findOne({
-            where: [{ email }, { username }],
-        });
+        const { email, password, first_name, last_name, username } = registerDto;
+        const existingUser = await this.userRepository.findOne({ where: { email } });
         if (existingUser) {
-            throw new common_1.ConflictException('El usuario ya existe con ese email o username');
+            throw new common_1.ConflictException('Ya existe un usuario con este correo electrónico.');
         }
-        const saltRounds = 10;
-        const password_hash = await bcrypt.hash(password, saltRounds);
-        const user = this.userRepository.create({
-            username,
+        const password_hash = await bcrypt.hash(password, 10);
+        const newUser = this.userRepository.create({
             email,
             password_hash,
             first_name,
             last_name,
+            username: username || email.split('@')[0],
+            is_active: true,
         });
-        const savedUser = await this.userRepository.save(user);
+        const savedUser = await this.userRepository.save(newUser);
         const { password_hash: _, ...userWithoutPassword } = savedUser;
-        return {
-            message: 'Usuario registrado exitosamente',
-            user: userWithoutPassword,
-        };
+        return userWithoutPassword;
     }
     async login(loginDto) {
         const { email, password } = loginDto;
-        const user = await this.userRepository.findOne({
-            where: { email },
-        });
-        if (!user) {
-            throw new common_1.UnauthorizedException('Credenciales inválidas');
-        }
-        const isPasswordValid = await bcrypt.compare(password, user.password_hash);
-        if (!isPasswordValid) {
-            throw new common_1.UnauthorizedException('Credenciales inválidas');
+        const user = await this.userRepository
+            .createQueryBuilder('user')
+            .addSelect('user.password_hash')
+            .where('user.email = :email', { email })
+            .getOne();
+        if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+            throw new common_1.UnauthorizedException('Correo o contraseña incorrectos.');
         }
         if (!user.is_active) {
-            throw new common_1.UnauthorizedException('Usuario inactivo');
+            throw new common_1.UnauthorizedException('La cuenta de usuario está inactiva.');
         }
-        const { password_hash: _, ...userWithoutPassword } = user;
+        const payload = {
+            sub: user.id,
+            username: user.username,
+            email: user.email,
+            name: `${user.first_name} ${user.last_name}`,
+        };
         return {
-            message: 'Login exitoso',
-            user: userWithoutPassword,
+            accessToken: this.jwtService.sign(payload),
         };
     }
 };
@@ -73,6 +73,7 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(entities_1.User)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

@@ -3,12 +3,8 @@ import { RegisterUserDto, LoginUserDto } from '../../dto/auth.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
-    register(registerDto: RegisterUserDto): Promise<{
-        message: string;
-        user: Partial<import("../../entities").User>;
-    }>;
+    register(registerDto: RegisterUserDto): Promise<Partial<import("../../entities").User>>;
     login(loginDto: LoginUserDto): Promise<{
-        message: string;
-        user: Partial<import("../../entities").User>;
+        accessToken: string;
     }>;
 }
